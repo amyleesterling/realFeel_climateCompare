@@ -5,69 +5,108 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RealFeel Climate Compare</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+  <div class="scanlines"></div>
+
   <header>
-    <h1>RealFeel Climate Compare</h1>
-    <p class="subtitle">Compare 20 years of climate data between any two locations</p>
+    <div class="header-glow"></div>
+    <h1 class="neon-title">REALFEEL</h1>
+    <h2 class="sub-title">CLIMATE SHOWDOWN</h2>
+    <p class="tagline">20 Years of Weather Data. Two Cities. One Winner.</p>
   </header>
 
   <main>
     <section class="search-section">
       <div class="search-row">
-        <div class="search-group location-1">
-          <label for="search1">Location 1</label>
+        <div class="search-group player player-1">
+          <div class="player-badge">P1</div>
+          <label for="search1">CHALLENGER 1</label>
           <div class="search-wrapper">
-            <input type="text" id="search1" placeholder="Search city..." autocomplete="off">
+            <input type="text" id="search1" placeholder="Enter city..." autocomplete="off">
             <div class="dropdown" id="dropdown1"></div>
           </div>
           <span class="selected-label" id="selected1"></span>
         </div>
 
-        <div class="vs-badge">VS</div>
+        <div class="vs-badge">
+          <span class="vs-glow">VS</span>
+        </div>
 
-        <div class="search-group location-2">
-          <label for="search2">Location 2</label>
+        <div class="search-group player player-2">
+          <div class="player-badge">P2</div>
+          <label for="search2">CHALLENGER 2</label>
           <div class="search-wrapper">
-            <input type="text" id="search2" placeholder="Search city..." autocomplete="off">
+            <input type="text" id="search2" placeholder="Enter city..." autocomplete="off">
             <div class="dropdown" id="dropdown2"></div>
           </div>
           <span class="selected-label" id="selected2"></span>
         </div>
       </div>
 
-      <button id="compareBtn" disabled>Compare Climates</button>
+      <button id="compareBtn" disabled>
+        <span class="btn-text">SHOWDOWN</span>
+        <span class="btn-sub">Analyze 20 Years of Climate</span>
+      </button>
     </section>
 
     <div id="loading" class="loading hidden">
-      <div class="spinner"></div>
-      <p>Fetching 20 years of climate data...</p>
+      <div class="spinner-ring">
+        <div class="spinner-inner"></div>
+      </div>
+      <p class="loading-text">CRUNCHING 20 YEARS OF DATA<span class="dots"></span></p>
     </div>
 
     <div id="error" class="error-message hidden"></div>
 
     <section id="results" class="results hidden">
-      <h2 class="results-title">
-        <span class="loc1-name"></span> vs <span class="loc2-name"></span>
-      </h2>
-      <p class="results-subtitle">20-Year Climate Averages (2006 &ndash; 2026)</p>
 
-      <div class="cards-grid" id="cardsGrid"></div>
+      <!-- Giant Winner Banner -->
+      <div class="winner-banner" id="winnerBanner">
+        <div class="confetti-container" id="confetti"></div>
+        <div class="trophy">&#127942;</div>
+        <h2 class="winner-title">WINNER</h2>
+        <h3 class="winner-name" id="winnerName"></h3>
+        <div class="winner-score-display">
+          <span class="score-label">COMFORT SCORE</span>
+          <span class="score-value" id="winnerScore"></span>
+        </div>
+      </div>
 
-      <h3 class="section-heading">Monthly Breakdown</h3>
-      <div class="charts-grid">
-        <div class="chart-card"><canvas id="chartTemp"></canvas></div>
-        <div class="chart-card"><canvas id="chartRealFeel"></canvas></div>
-        <div class="chart-card"><canvas id="chartPrecip"></canvas></div>
-        <div class="chart-card"><canvas id="chartSunshine"></canvas></div>
-        <div class="chart-card"><canvas id="chartWind"></canvas></div>
+      <!-- Scoreboard -->
+      <div class="scoreboard">
+        <h3 class="board-title">THE SCOREBOARD</h3>
+        <p class="board-subtitle">Higher comfort score = more pleasant for humans</p>
+        <div class="score-bars" id="scoreBars"></div>
+      </div>
+
+      <!-- Head to Head -->
+      <div class="h2h-section">
+        <h3 class="board-title">HEAD TO HEAD</h3>
+        <p class="board-subtitle">20-year averages &mdash; category winners highlighted</p>
+        <div class="h2h-grid" id="h2hGrid"></div>
+      </div>
+
+      <!-- Monthly Breakdown Charts -->
+      <div class="charts-section">
+        <h3 class="board-title">MONTHLY BREAKDOWN</h3>
+        <p class="board-subtitle">Month-by-month showdown across 20 years</p>
+        <div class="charts-grid">
+          <div class="chart-card"><canvas id="chartTemp"></canvas></div>
+          <div class="chart-card"><canvas id="chartRealFeel"></canvas></div>
+          <div class="chart-card"><canvas id="chartPrecip"></canvas></div>
+          <div class="chart-card"><canvas id="chartSunshine"></canvas></div>
+          <div class="chart-card"><canvas id="chartWind"></canvas></div>
+        </div>
       </div>
     </section>
   </main>
 
   <footer>
-    <p>Data provided by <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> | Historical weather data 2006&ndash;2026</p>
+    <p>Data from <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> &bull; 2006&ndash;2026 historical archive</p>
   </footer>
 
   <script src="app.js"></script>
