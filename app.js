@@ -425,13 +425,62 @@
   Chart.defaults.color = "#6b7a94";
   Chart.defaults.borderColor = "rgba(255,255,255,0.06)";
 
+  // Custom plugin: shade the area between the two datasets
+  const diffFillPlugin = {
+    id: "diffFill",
+    beforeDatasetsDraw(chart) {
+      if (chart.config.type !== "line") return;
+      const ds = chart.data.datasets;
+      if (ds.length < 2) return;
+      // Only draw if both datasets are visible
+      const meta0 = chart.getDatasetMeta(0);
+      const meta1 = chart.getDatasetMeta(1);
+      if (meta0.hidden || meta1.hidden) return;
+
+      const ctx = chart.ctx;
+      const pts0 = meta0.data;
+      const pts1 = meta1.data;
+      if (!pts0.length || !pts1.length) return;
+
+      ctx.save();
+      ctx.beginPath();
+      // Trace dataset 0 forward
+      pts0.forEach((pt, i) => { i === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y); });
+      // Trace dataset 1 backward
+      for (let i = pts1.length - 1; i >= 0; i--) ctx.lineTo(pts1[i].x, pts1[i].y);
+      ctx.closePath();
+      ctx.fillStyle = "rgba(255, 215, 0, 0.08)";
+      ctx.fill();
+      ctx.restore();
+    },
+  };
+
+  Chart.register(diffFillPlugin);
+
   function lineDatasets(name1, name2, m1, m2, key) {
     const c = chartColors();
     return {
       labels: MONTHS,
       datasets: [
-        { label: name1, data: m1.map((m) => +m[key].toFixed(1)), borderColor: c.p1, backgroundColor: c.p1bg, tension: 0.35, fill: false, pointRadius: 4, pointHoverRadius: 7, borderWidth: 2.5 },
-        { label: name2, data: m2.map((m) => +m[key].toFixed(1)), borderColor: c.p2, backgroundColor: c.p2bg, tension: 0.35, fill: false, pointRadius: 4, pointHoverRadius: 7, borderWidth: 2.5 },
+        {
+          label: name1, data: m1.map((m) => +m[key].toFixed(1)),
+          borderColor: c.p1, backgroundColor: "rgba(255,107,61,0.25)",
+          tension: 0.35, fill: false,
+          pointRadius: 5, pointHoverRadius: 9, borderWidth: 3.5,
+          pointStyle: "circle",
+          pointBackgroundColor: c.p1,
+          pointBorderColor: "#fff", pointBorderWidth: 2,
+        },
+        {
+          label: name2, data: m2.map((m) => +m[key].toFixed(1)),
+          borderColor: c.p2, backgroundColor: "rgba(0,200,255,0.25)",
+          tension: 0.35, fill: false,
+          pointRadius: 5, pointHoverRadius: 9, borderWidth: 3.5,
+          borderDash: [8, 4],
+          pointStyle: "rectRot",
+          pointBackgroundColor: c.p2,
+          pointBorderColor: "#fff", pointBorderWidth: 2,
+        },
       ],
     };
   }
@@ -441,8 +490,8 @@
     return {
       labels: MONTHS,
       datasets: [
-        { label: name1, data: m1.map((m) => +m[key].toFixed(2)), backgroundColor: c.p1bg.replace("0.15", "0.65"), borderColor: c.p1, borderWidth: 1, borderRadius: 4 },
-        { label: name2, data: m2.map((m) => +m[key].toFixed(2)), backgroundColor: c.p2bg.replace("0.15", "0.65"), borderColor: c.p2, borderWidth: 1, borderRadius: 4 },
+        { label: name1, data: m1.map((m) => +m[key].toFixed(2)), backgroundColor: "rgba(255,107,61,0.7)", borderColor: c.p1, borderWidth: 2, borderRadius: 4 },
+        { label: name2, data: m2.map((m) => +m[key].toFixed(2)), backgroundColor: "rgba(0,200,255,0.7)", borderColor: c.p2, borderWidth: 2, borderRadius: 4 },
       ],
     };
   }
@@ -450,9 +499,25 @@
   function chartOpts(title, yLabel) {
     return {
       responsive: true,
+      interaction: { mode: "index", intersect: false },
       plugins: {
         title: { display: true, text: title, font: { size: 14, weight: "700", family: "'Exo 2'" }, color: "#e8edf5" },
-        legend: { position: "bottom", labels: { font: { family: "'Exo 2'" }, usePointStyle: true, padding: 16 } },
+        subtitle: { display: true, text: "Tap legend to show/hide a city", font: { size: 11, family: "'Exo 2'", style: "italic" }, color: "#6b7a94", padding: { bottom: 8 } },
+        legend: {
+          position: "bottom",
+          labels: { font: { size: 13, family: "'Exo 2'", weight: "600" }, usePointStyle: true, padding: 20, pointStyleWidth: 14 },
+        },
+        tooltip: {
+          backgroundColor: "rgba(17,24,39,0.95)",
+          titleFont: { family: "'Exo 2'", weight: "700" },
+          bodyFont: { family: "'Exo 2'" },
+          borderColor: "rgba(255,215,0,0.3)",
+          borderWidth: 1,
+          padding: 12,
+          callbacks: {
+            label: (ctx) => ` ${ctx.dataset.label}: ${ctx.parsed.y} ${yLabel}`,
+          },
+        },
       },
       scales: {
         y: { title: { display: true, text: yLabel, font: { family: "'Exo 2'" } }, grid: { color: "rgba(255,255,255,0.04)" } },
