@@ -581,4 +581,65 @@
     if (!search1.contains(e.target) && !dropdown1.contains(e.target)) dropdown1.classList.remove("open");
     if (!search2.contains(e.target) && !dropdown2.contains(e.target)) dropdown2.classList.remove("open");
   });
+
+  // ---- Easter Egg ----
+  (function initEasterEgg() {
+    const KONAMI = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
+    let seq = [];
+    let vsClicks = 0;
+    let easterActive = false;
+
+    function triggerEaster() {
+      if (easterActive) return;
+      easterActive = true;
+      document.body.classList.add("easter-mode");
+
+      // toast
+      const toast = document.createElement("div");
+      toast.className = "easter-toast";
+      toast.textContent = "\u{1F95A} You found the Easter egg! \u{1F423}";
+      document.body.appendChild(toast);
+      requestAnimationFrame(() => toast.classList.add("show"));
+
+      // falling eggs
+      const emojis = ["\u{1F95A}","\u{1F423}","\u{1F430}","\u{1F337}","\u{1F31F}","\u{1FAB6}"];
+      for (let i = 0; i < 40; i++) {
+        const egg = document.createElement("div");
+        egg.className = "easter-egg-drop";
+        egg.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        egg.style.left = Math.random() * 100 + "vw";
+        egg.style.animationDuration = (2 + Math.random() * 3) + "s";
+        egg.style.animationDelay = Math.random() * 2 + "s";
+        egg.style.fontSize = (1.2 + Math.random() * 1.8) + "rem";
+        document.body.appendChild(egg);
+        egg.addEventListener("animationend", () => egg.remove());
+      }
+
+      // revert after 6 seconds
+      setTimeout(() => {
+        document.body.classList.remove("easter-mode");
+        toast.classList.remove("show");
+        setTimeout(() => { toast.remove(); easterActive = false; }, 500);
+      }, 6000);
+    }
+
+    document.addEventListener("keydown", (e) => {
+      seq.push(e.key);
+      if (seq.length > KONAMI.length) seq.shift();
+      if (seq.length === KONAMI.length && seq.every((k, i) => k === KONAMI[i])) {
+        seq = [];
+        triggerEaster();
+      }
+    });
+
+    const vsBadge = document.querySelector(".vs-badge");
+    if (vsBadge) {
+      vsBadge.style.cursor = "pointer";
+      vsBadge.addEventListener("click", () => {
+        vsClicks++;
+        if (vsClicks >= 7) { vsClicks = 0; triggerEaster(); }
+        setTimeout(() => { vsClicks = 0; }, 3000);
+      });
+    }
+  })();
 })();
